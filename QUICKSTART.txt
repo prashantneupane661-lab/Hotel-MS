@@ -1,0 +1,76 @@
+========================================
+HOTEL MANAGEMENT SYSTEM - QUICK START
+========================================
+
+1. START XAMPP
+   → Open XAMPP Control Panel
+   → Click "Start" for Apache
+   → Click "Start" for MySQL
+   → Both should show green
+
+2. SETUP DATABASE
+   Option A - Automatic (Recommended):
+   → Visit: http://localhost/hotel-management/setup_database.php
+   → This will create the error_logs table and verify all tables
+
+   Option B - Manual:
+   → Visit: http://localhost/phpmyadmin
+   → Click "Import"
+   → Select: database/schema.sql
+   → Click "Go"
+
+3. CREATE LOGS FOLDER
+   → Already created: c:\xampp\htdocs\hotel-management\logs
+
+4. ACCESS THE APPLICATION
+   → http://localhost/hotel-management
+
+5. DEFAULT LOGIN CREDENTIALS
+   Admin:      username: admin        password: password
+   Reception:  username: reception    password: password
+   Accountant: username: accountant   password: password
+   Customer:   username: customer1    password: password
+
+========================================
+TROUBLESHOOTING
+========================================
+
+• MySQL won't start?
+  → Check if port 3306 is in use
+  → XAMPP Control Panel → Config → my.ini → change port
+
+• Apache won't start?
+  → Check if port 80 is in use (Skype, IIS)
+  → XAMPP Control Panel → Config → httpd.conf → change port
+
+• "Database connection failed" error?
+  → Make sure MySQL is running (green in XAMPP)
+  → Check config/db.php for correct credentials (default: root, no password)
+
+• "Table doesn't exist" error?
+  → Run setup_database.php or import schema.sql
+
+• Permission denied on uploads?
+  → Make sure assets/uploads folder exists
+
+========================================
+FEATURES INCLUDED
+========================================
+
+✓ Role-based access (Admin, Receptionist, Accountant, Customer)
+✓ SQL injection prevention (all queries use prepared statements)
+✓ CSRF protection (all forms have CSRF tokens)
+✓ Password hashing (bcrypt)
+✓ Session timeout (30 minutes)
+✓ Input validation
+✓ Account lockout (5 failed attempts = 15 min lock)
+✓ Error logging (database + file)
+✓ Notifications system
+✓ Housekeeping tracking
+✓ Extra services billing
+✓ Invoice management
+✓ Payment tracking
+✓ Reports & exports
+✓ Dashboard analytics
+
+========================================

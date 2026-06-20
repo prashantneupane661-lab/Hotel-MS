@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fix Booking Status - Quick Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 40px 0; }
+        .main-card { border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .step-box { border-left: 4px solid #667eea; background: #f8f9fa; padding: 20px; margin-bottom: 20px; border-radius: 5px; }
+        .code-box { background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; font-size: 14px; }
+        .badge-pending { background: #f59e0b; color: white; padding: 5px 15px; border-radius: 20px; }
+        .badge-confirmed { background: #22c55e; color: white; padding: 5px 15px; border-radius: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div class="card main-card">
+                    <div class="card-header bg-white text-center py-4">
+                        <h2 class="mb-2"><i class="bi bi-tools"></i> Fix Booking Status Workflow</h2>
+                        <p class="text-muted mb-0">Simple 2-step fix to show "Pending" status correctly</p>
+                    </div>
+                    <div class="card-body p-4">
+                        
+                        <div class="alert alert-warning">
+                            <h5 class="alert-heading"><i class="bi bi-exclamation-triangle"></i> Current Issue:</h5>
+                            <p class="mb-0">When customers book a room, the Status column shows as <strong>empty</strong> instead of <span class="badge badge-pending">Pending</span></p>
+                        </div>
+
+                        <!-- STEP 1 -->
+                        <div class="step-box">
+                            <h4 class="mb-3">
+                                <span class="badge bg-primary me-2">Step 1</span>
+                                Fix Database Column
+                            </h4>
+                            <p class="text-muted">This ensures the status column has proper default value and ENUM options</p>
+                            
+                            <h6 class="mt-3">📋 Instructions:</h6>
+                            <ol>
+                                <li>Open <strong>phpMyAdmin</strong>: <code>http://localhost/phpmyadmin</code></li>
+                                <li>Click on database: <strong>hotel_management</strong></li>
+                                <li>Click <strong>SQL</strong> tab at the top</li>
+                                <li>Copy and paste the code below</li>
+                                <li>Click <strong>"Go"</strong> button</li>
+                            </ol>
+
+                            <div class="code-box mt-3">
+-- Fix the bookings status column
+ALTER TABLE bookings 
+MODIFY COLUMN status ENUM('pending','confirmed','rejected','checked_in','checked_out','cancelled') 
+NOT NULL 
+DEFAULT 'pending';
+
+-- Fix any existing empty statuses
+UPDATE bookings 
+SET status = 'pending' 
+WHERE status IS NULL OR status = '';
+
+-- Verify the fix
+SELECT status, COUNT(*) as total FROM bookings GROUP BY status;
+                            </div>
+
+                            <div class="alert alert-success mt-3">
+                                <strong>✅ Expected Result:</strong> Query executed successfully. All bookings now have status = 'pending' or valid value.
+                            </div>
+                        </div>
+
+                        <!-- STEP 2 -->
+                        <div class="step-box">
+                            <h4 class="mb-3">
+                                <span class="badge bg-success me-2">Step 2</span>
+                                Test the Complete Workflow
+                            </h4>
+
+                            <h6 class="mt-4">👤 Test as Customer:</h6>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <ol class="mb-0">
+                                        <li>Login: <code>customer@test.com</code></li>
+                                        <li>Go to: <strong>Book a Room</strong></li>
+                                        <li>Search rooms → Select room → Book Now</li>
+                                        <li>✅ Should see: <span class="badge badge-pending">Pending</span> badge</li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <h6 class="mt-3">👨‍💼 Test as Admin/Reception:</h6>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <ol class="mb-0">
+                                        <li>Login: <code>admin@hotel.com</code></li>
+                                        <li>Dashboard shows pending bookings alert</li>
+                                        <li>Go to: <strong>All Bookings</strong></li>
+                                        <li>Filter by Status: <strong>Pending</strong></li>
+                                        <li>See the booking with <span class="badge badge-pending">Pending</span> badge</li>
+                                        <li>Click <button class="btn btn-success btn-sm"><i class="bi bi-check-circle"></i> Accept</button></li>
+                                        <li>✅ Booking status changes to: <span class="badge badge-confirmed">Confirmed</span></li>
+                                    </ol>
+                                </div>
+                            </div>
+
+                            <h6 class="mt-3">👤 Back to Customer:</h6>
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <ol class="mb-0">
+                                        <li>Refresh customer dashboard</li>
+                                        <li>✅ Booking status now shows: <span class="badge badge-confirmed">Confirmed</span> (Green badge)</li>
+                                        <li>Check notification bell for confirmation message</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- VISUAL REFERENCE -->
+                        <div class="step-box">
+                            <h4 class="mb-3">🎨 Status Badge Colors</h4>
+                            <div class="row text-center">
+                                <div class="col-md-2 mb-2">
+                                    <span class="badge badge-pending">Pending</span>
+                                    <div class="small text-muted mt-1">Yellow</div>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <span class="badge badge-confirmed">Confirmed</span>
+                                    <div class="small text-muted mt-1">Green</div>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <span class="badge" style="background:#dc2626;color:white;">Rejected</span>
+                                    <div class="small text-muted mt-1">Red</div>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <span class="badge" style="background:#3b82f6;color:white;">Checked In</span>
+                                    <div class="small text-muted mt-1">Blue</div>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <span class="badge" style="background:#6b7280;color:white;">Checked Out</span>
+                                    <div class="small text-muted mt-1">Gray</div>
+                                </div>
+                                <div class="col-md-2 mb-2">
+                                    <span class="badge" style="background:#991b1b;color:white;">Cancelled</span>
+                                    <div class="small text-muted mt-1">Dark Red</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- QUICK LINKS -->
+                        <div class="step-box">
+                            <h4 class="mb-3">🔗 Quick Test Links</h4>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h6>👤 Customer:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a href="/hotel-management/customer/book_room.php" target="_blank">📅 Book a Room</a></li>
+                                        <li><a href="/hotel-management/customer/dashboard.php" target="_blank">📊 My Dashboard</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>👨‍💼 Admin:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a href="/hotel-management/admin/dashboard.php" target="_blank">📊 Dashboard</a></li>
+                                        <li><a href="/hotel-management/admin/bookings.php" target="_blank">📋 All Bookings</a></li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-4">
+                                    <h6>👩‍💼 Reception:</h6>
+                                    <ul class="list-unstyled">
+                                        <li><a href="/hotel-management/reception/dashboard.php" target="_blank">📊 Dashboard</a></li>
+                                        <li><a href="/hotel-management/reception/all_bookings.php" target="_blank">📋 All Bookings</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-success mt-4">
+                            <h5 class="alert-heading">✅ That's It!</h5>
+                            <p class="mb-0">
+                                After running the SQL query in Step 1, your booking status workflow will work perfectly. 
+                                The code is already complete - it just needs the database column to be fixed!
+                            </p>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <a href="/hotel-management/" class="btn btn-primary btn-lg me-2">
+                                <i class="bi bi-house-door"></i> Go to Hotel System
+                            </a>
+                            <a href="https://localhost/phpmyadmin" class="btn btn-outline-primary btn-lg" target="_blank">
+                                <i class="bi bi-database"></i> Open phpMyAdmin
+                            </a>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
